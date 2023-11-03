@@ -4,16 +4,20 @@ import org.example.platzi.model.Employee;
 import org.example.platzi.repository.EmployeeRepository;
 import org.example.platzi.repository.Repository;
 import org.example.platzi.util.DatabaseConnection;
+import org.example.platzi.view.SwingApp;
 
 import java.sql.*;
 
 public class main {
     public static void main(String[] args) throws SQLException {
 
+        SwingApp app = new SwingApp();
+        app.setVisible(true);
+
         //Try-with resources - Try con recursos
         //Los recursos declarados dentro del bloque try se cierran automaticamente al finalizar el bloque
         //Ya sea que se haya producido una excepcion o no, se evita el finally despues del catch
-        try( Connection myConn = DatabaseConnection.getInstance()){
+        /*try( Connection myConn = DatabaseConnection.getInstance()){
             Repository<Employee> repository = new EmployeeRepository();
 
             System.out.println("---findAll()---");
@@ -50,8 +54,7 @@ public class main {
 
             System.out.println("---findAll() después de actualizar o insertar empleado---");
             repository.findAll().forEach(System.out::println);
-
-        }
+        }*/
     }
 
 }
