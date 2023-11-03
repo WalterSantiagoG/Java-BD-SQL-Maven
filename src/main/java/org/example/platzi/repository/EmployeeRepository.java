@@ -9,14 +9,16 @@ import java.util.List;
 
 public class EmployeeRepository implements Repository<Employee>{
 
-    private Connection getConnection() throws SQLException {
-        return DatabaseConnection.getInstance();
+    private Connection myConn;
+
+    public EmployeeRepository(Connection myConn) {
+        this.myConn = myConn;
     }
 
     @Override
     public List<Employee> findAll() throws SQLException {
         List<Employee> employees = new ArrayList<>();
-        try(Statement myStant = getConnection().createStatement();
+        try(Statement myStant = myConn.createStatement();
             ResultSet myRes = myStant.executeQuery("SELECT * FROM employees");){
             while (myRes.next()){
                 employees.add(createEmployee(myRes));
@@ -28,7 +30,7 @@ public class EmployeeRepository implements Repository<Employee>{
     @Override
     public Employee getById(Integer id) throws SQLException {
         Employee employee = null;
-        try(PreparedStatement myStant =  getConnection().prepareStatement("SELECT * FROM employees WHERE id = ?")){
+        try(PreparedStatement myStant =  myConn.prepareStatement("SELECT * FROM employees WHERE id = ?")){
             myStant.setInt(1,id);
             try(ResultSet myRes = myStant.executeQuery();){
                 if (myRes.next()){
@@ -44,13 +46,14 @@ public class EmployeeRepository implements Repository<Employee>{
     public void update(Integer id, Employee employee) throws SQLException {
         //Solución al Reto, actualizar empleado si existe, si no existe, crear el empleado automáticamente
         if(getById(id) != null){
-            String sql = "UPDATE employees SET first_name = ?, pa_surname = ?, ma_surname = ?, email = ?, salary = ? WHERE id = "+id;
-            try(PreparedStatement myStamt = getConnection().prepareStatement(sql);){
+            String sql = "UPDATE employees SET first_name = ?, pa_surname = ?, ma_surname = ?, email = ?, salary = ?, curp = ?  WHERE id = "+id;
+            try(PreparedStatement myStamt = myConn.prepareStatement(sql);){
                 myStamt.setString(1,employee.getFirst_name());
                 myStamt.setString(2,employee.getPa_surname());
                 myStamt.setString(3,employee.getMa_surname());
                 myStamt.setString(4,employee.getEmail());
                 myStamt.setFloat(5,employee.getSalary());
+                myStamt.setString(6,employee.getCurp());
                 myStamt.executeUpdate();
             }
             System.out.println("Empleado existe, actualización realizada");
@@ -64,13 +67,14 @@ public class EmployeeRepository implements Repository<Employee>{
 
     @Override
     public void save(Employee employee) throws SQLException {
-        String sql = "INSERT INTO employees (first_name, pa_surname, ma_surname, email, salary) VALUES (?, ?, ?, ?, ?)";
-        try(PreparedStatement myStamt = getConnection().prepareStatement(sql);){
+        String sql = "INSERT INTO employees (first_name, pa_surname, ma_surname, email, salary, curp) VALUES (?, ?, ?, ?, ?, ?)";
+        try(PreparedStatement myStamt = myConn.prepareStatement(sql);){
             myStamt.setString(1,employee.getFirst_name());
             myStamt.setString(2,employee.getPa_surname());
             myStamt.setString(3,employee.getMa_surname());
             myStamt.setString(4,employee.getEmail());
             myStamt.setFloat(5,employee.getSalary());
+            myStamt.setString(6,employee.getCurp());
             myStamt.executeUpdate();
         }
     }
@@ -78,7 +82,7 @@ public class EmployeeRepository implements Repository<Employee>{
     @Override
     public void delete(Integer id) throws SQLException {
         if(getById(id) != null){
-            try(PreparedStatement myStamt = getConnection().prepareStatement("DELETE FROM employees WHERE id= ?")){
+            try(PreparedStatement myStamt = myConn.prepareStatement("DELETE FROM employees WHERE id= ?")){
                 myStamt.setInt(1,id);
                 myStamt.executeUpdate();
                 System.out.println("Empleado eliminado");
@@ -96,6 +100,7 @@ public class EmployeeRepository implements Repository<Employee>{
         e.setMa_surname(myRes.getString("ma_surname"));
         e.setEmail(myRes.getString("email"));
         e.setSalary(myRes.getFloat("salary"));
+        e.setCurp(myRes.getString("curp"));
         return e;
     }
 }
