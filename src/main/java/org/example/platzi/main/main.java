@@ -10,7 +10,14 @@ import java.sql.*;
 public class main {
     public static void main(String[] args) throws SQLException {
 
-        try(Connection myConn = DatabaseConnection.getInstance()){
+        System.out.println("---Listando todos---");
+        Repository<Employee> repository = new EmployeeRepository();
+        repository.findAll().forEach(System.out::println);
+
+        System.out.println("---Buscando por ID---");
+        System.out.println(repository.getById(2));
+
+        /*try(Connection myConn = DatabaseConnection.getInstance()){
             if (myConn.getAutoCommit()){
                 myConn.setAutoCommit(false);
             }
@@ -25,7 +32,7 @@ public class main {
                 employee.setSalary((float)9500);
                 employee.setCurp("AMEC234Y9152478TOU");
                 repository.save(employee);
-                myConn.commit();*/
+                myConn.commit();
 
                 employee.setFirst_name("David");
                 employee.setPa_surname("Gutierrez");
@@ -40,7 +47,7 @@ public class main {
                 myConn.rollback();
                 throw new RuntimeException(e);
             }
-        }
+        }*/
 
         //SwingApp app = new SwingApp();
         //app.setVisible(true);
